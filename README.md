@@ -6,7 +6,7 @@ It is built to answer a more useful question than “when will the economy colla
 
 > Which fragilities are historically stretched, which are actively transmitting stress, and how broad is the deterioration?
 
-The app currently assembles roughly 58 usable KPIs from 43 FRED series, daily market data, U.S. Treasury data, Treasury International Capital holdings, and SEC company facts. Provider failures are isolated, and the last successful downloads remain available in a local cache.
+The app currently assembles roughly 58 usable KPIs from 43 FRED series, daily market data, U.S. Treasury data, Treasury International Capital holdings, and SEC company facts. Provider failures are isolated, and the last successful downloads remain available in a local cache. A compressed deployment seed supplies the collected history on the first run, so a temporary provider outage does not prevent a cold server from starting.
 
 ## Run it
 
@@ -28,7 +28,9 @@ Charts default to **Since 1990**, so the dot-com peak, the 2007 credit-cycle tur
 
 The sidebar’s **Refresh all sources** button preserves `.world_kpi_cache/` history. FRED and market feeds download only a recent overlap, merge revisions and append new observations. Daily refresh does not make monthly or quarterly releases update daily; every KPI shows its own observation date and frequency.
 
-For server deployments, mount `.world_kpi_cache/` on persistent storage. That allows the long archive to be collected once and survive restarts or new application versions. A stateless server will rebuild the archive after a new instance starts.
+The repository includes `data_seed/world_kpi_seed.zip`, a compressed snapshot of the public source archives used by the dashboard. On a new deployment, missing cache files are hydrated from this seed before network refreshes begin. Seed data never overwrite a file that the server has already refreshed.
+
+For long-running server deployments, mount `.world_kpi_cache/` on persistent storage when the platform supports it. Streamlit Community Cloud can start directly from the bundled seed; newer observations and revisions are merged into its runtime cache while the instance remains available. A rebuild starts from the seed again and then resumes normal refreshes.
 
 ## What is included
 
@@ -77,4 +79,4 @@ pytest
 python -m compileall -q app.py world_kpi
 ```
 
-The unit suite checks percentile orientation, two-sided risks, release-frequency transforms, equal pillar weighting, SEC concept transitions, persistent incremental merges and crisis markers.
+The unit suite checks percentile orientation, two-sided risks, release-frequency transforms, equal pillar weighting, SEC concept transitions, persistent incremental merges, crisis markers, complete market-source outages and non-destructive seed hydration.

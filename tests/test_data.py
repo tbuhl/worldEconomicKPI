@@ -1,7 +1,13 @@
+from zipfile import ZipFile
+
 import pandas as pd
+
+import world_kpi.data as data_module
 
 from world_kpi.data import (
     _annual_duration_series,
+    hydrate_seed_cache,
+    load_market_metrics,
     merge_incremental_series,
     summarize_top_tic_holders,
 )
@@ -83,3 +89,31 @@ def test_top_tic_holders_are_dynamic_and_sales_are_ranked_against_own_history() 
     assert country_a["Latest net flow ($bn)"] == -100.0
     assert country_a["Sale percentile"] >= 95
     assert country_a["Assessment"] == "Extreme sale"
+
+
+def test_market_loader_survives_when_every_symbol_is_unavailable(monkeypatch) -> None:
+    def unavailable(symbol: str) -> pd.Series:
+        raise RuntimeError(f"{symbol} unavailable")
+
+    monkeypatch.setattr(data_module, "_yahoo_prices", unavailable)
+    metrics, failures = load_market_metrics()
+
+    assert metrics == {}
+    assert len(failures) == 11
+
+
+def test_seed_hydration_only_fills_missing_cache_files(tmp_path) -> None:
+    archive = tmp_path / "seed.zip"
+    cache = tmp_path / "cache"
+    existing = cache / "fred" / "EXISTING.csv"
+    existing.parent.mkdir(parents=True)
+    existing.write_text("local refresh", encoding="utf-8")
+    with ZipFile(archive, "w") as bundle:
+        bundle.writestr("fred/EXISTING.csv", "seed value")
+        bundle.writestr("fred/MISSING.csv", "seed history")
+
+    extracted = hydrate_seed_cache(archive=archive, cache_dir=cache)
+
+    assert extracted == 1
+    assert existing.read_text(encoding="utf-8") == "local refresh"
+    assert (cache / "fred" / "MISSING.csv").read_text(encoding="utf-8") == "seed history"

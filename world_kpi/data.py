@@ -5,6 +5,7 @@ import json
 import math
 import os
 import time
+import zipfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any, Iterable
@@ -27,6 +28,7 @@ USER_AGENT = os.getenv(
     "WORLD_KPI_USER_AGENT", "WorldKPI-Radar/0.1 research dashboard contact: local-user"
 )
 CACHE_DIR = Path(os.getenv("WORLD_KPI_CACHE", ".world_kpi_cache"))
+SEED_ARCHIVE = Path(__file__).resolve().parent.parent / "data_seed" / "world_kpi_seed.zip"
 
 
 def _session() -> requests.Session:
@@ -40,6 +42,41 @@ def _cache_path(namespace: str, key: str, suffix: str) -> Path:
     path = CACHE_DIR / namespace / f"{safe}.{suffix}"
     path.parent.mkdir(parents=True, exist_ok=True)
     return path
+
+
+def hydrate_seed_cache(
+    archive: Path | None = None,
+    cache_dir: Path | None = None,
+) -> int:
+    """Hydrate missing cache files from the versioned deployment seed.
+
+    The seed makes a cold, stateless deployment useful even when a provider is
+    temporarily blocked. It never overwrites files that a running deployment has
+    already refreshed.
+    """
+    archive = archive or SEED_ARCHIVE
+    cache_dir = cache_dir or CACHE_DIR
+    if not archive.exists():
+        return 0
+
+    cache_root = cache_dir.resolve()
+    extracted = 0
+    with zipfile.ZipFile(archive) as bundle:
+        for member in bundle.infolist():
+            if member.is_dir():
+                continue
+            target = (cache_dir / member.filename).resolve()
+            try:
+                target.relative_to(cache_root)
+            except ValueError as exc:
+                raise ValueError(f"Unsafe path in deployment seed: {member.filename}") from exc
+            if target.exists():
+                continue
+            target.parent.mkdir(parents=True, exist_ok=True)
+            with bundle.open(member) as source, target.open("wb") as destination:
+                destination.write(source.read())
+            extracted += 1
+    return extracted
 
 
 def _fresh(path: Path, max_age_hours: float) -> bool:
@@ -403,11 +440,13 @@ def load_market_metrics() -> tuple[dict[str, pd.Series], dict[str, str]]:
         metrics["semis_return"] = semis.pct_change(252, fill_method=None) * 100
         metrics["semis_drawdown"] = (semis / semis.cummax() - 1) * 100
 
-    ai_returns = pd.concat(
-        [series.pct_change(fill_method=None).rename(symbol) for symbol, series in prices.items() if symbol in {"NVDA", "MSFT", "GOOGL", "AMZN", "META", "ORCL", "PLTR"}],
-        axis=1,
-    )
-    if not ai_returns.empty:
+    ai_return_series = [
+        series.pct_change(fill_method=None).rename(symbol)
+        for symbol, series in prices.items()
+        if symbol in {"NVDA", "MSFT", "GOOGL", "AMZN", "META", "ORCL", "PLTR"}
+    ]
+    if ai_return_series:
+        ai_returns = pd.concat(ai_return_series, axis=1)
         # Require at least four live constituents to avoid a single-stock history masquerading as a basket.
         basket_returns = ai_returns.mean(axis=1, skipna=True).where(ai_returns.count(axis=1) >= 4)
         basket_index = (1 + basket_returns.fillna(0)).cumprod()

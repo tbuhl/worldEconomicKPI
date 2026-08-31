@@ -1,7 +1,6 @@
 import pandas as pd
 
 from world_kpi.scoring import (
-    category_scores,
     overall_pressure,
     percentile_rank,
     risk_from_percentile,
@@ -34,4 +33,3 @@ def test_yoy_transform_uses_configured_release_frequency() -> None:
 
 def test_overall_pressure_equal_weights_pillars() -> None:
     assert overall_pressure({"Pillar with 30 KPIs": 90, "Pillar with 3 KPIs": 10}) == 50
-

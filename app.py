@@ -14,6 +14,7 @@ from world_kpi.data import (
     build_fred_snapshots,
     build_market_snapshots,
     build_sec_snapshots,
+    hydrate_seed_cache,
     load_daily_debt,
     load_fred_bundle,
     load_market_metrics,
@@ -32,7 +33,6 @@ from world_kpi.scoring import (
     risk_label,
 )
 from world_kpi.ui import (
-    COLORS,
     category_bar,
     crisis_heatmap,
     format_value,
@@ -58,6 +58,7 @@ inject_css()
 @st.cache_data(ttl=6 * 3600, show_spinner=False)
 def load_dashboard_data() -> dict:
     # Each provider can fail independently; one outage should not blank the full dashboard.
+    hydrate_seed_cache()
     with ThreadPoolExecutor(max_workers=5) as executor:
         fred_job = executor.submit(load_fred_bundle)
         market_job = executor.submit(load_market_metrics)
@@ -65,9 +66,18 @@ def load_dashboard_data() -> dict:
         debt_job = executor.submit(load_daily_debt)
         tic_job = executor.submit(load_tic_holdings)
 
-        fred_series, fred_failures = fred_job.result()
-        market_series, market_failures = market_job.result()
-        sec_series, company_capex, sec_failures = sec_job.result()
+        try:
+            fred_series, fred_failures = fred_job.result()
+        except Exception as exc:
+            fred_series, fred_failures = {}, {"fred_provider": str(exc)}
+        try:
+            market_series, market_failures = market_job.result()
+        except Exception as exc:
+            market_series, market_failures = {}, {"market_provider": str(exc)}
+        try:
+            sec_series, company_capex, sec_failures = sec_job.result()
+        except Exception as exc:
+            sec_series, company_capex, sec_failures = {}, pd.DataFrame(), {"sec_provider": str(exc)}
         try:
             debt = debt_job.result()
         except Exception as exc:

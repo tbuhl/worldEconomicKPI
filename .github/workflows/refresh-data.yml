@@ -1,0 +1,32 @@
+name: Refresh historical data
+on:
+  schedule:
+    - cron: '25 7 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: refresh-data
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: python scripts/refresh_seed.py
+        env:
+          WORLD_KPI_USER_AGENT: 'WorldKPIRadar research dashboard github.com/tbuhl/worldEconomicKPI'
+      - name: Publish refreshed archive
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data_seed/world_kpi_seed.zip data_seed/refresh_status.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Update historical data snapshot'
+            git push
+          fi

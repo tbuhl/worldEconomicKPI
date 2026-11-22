@@ -1,4 +1,4 @@
-from zipfile import ZipFile
+from zipfile import ZipFile, ZipInfo
 
 import pandas as pd
 
@@ -117,3 +117,45 @@ def test_seed_hydration_only_fills_missing_cache_files(tmp_path) -> None:
     assert extracted == 1
     assert existing.read_text(encoding="utf-8") == "local refresh"
     assert (cache / "fred" / "MISSING.csv").read_text(encoding="utf-8") == "seed history"
+
+
+def test_old_seed_does_not_look_like_a_recent_download(tmp_path) -> None:
+    archive = tmp_path / "seed.zip"
+    cache = tmp_path / "cache"
+    with ZipFile(archive, "w") as bundle:
+        bundle.writestr(ZipInfo("fred/TEST.csv", (2000, 1, 1, 0, 0, 0)), "date,value\n2000-01-01,1\n")
+    hydrate_seed_cache(archive, cache)
+    assert not data_module._fresh(cache / "fred" / "TEST.csv", 18)
+
+
+def test_seed_extends_existing_history_without_replacing_runtime_revisions(tmp_path) -> None:
+    archive = tmp_path / "seed.zip"
+    cache = tmp_path / "cache"
+    target = cache / "fred" / "TEST.csv"
+    target.parent.mkdir(parents=True)
+    target.write_text("date,value\n2000-01-01,9\n", encoding="utf-8")
+    with ZipFile(archive, "w") as bundle:
+        bundle.writestr("fred/TEST.csv", "date,value\n2000-01-01,1\n2026-11-01,2\n")
+    hydrate_seed_cache(archive, cache)
+    result = data_module._read_cached_series(target, "TEST")
+    assert result.iloc[0] == 9
+    assert result.iloc[-1] == 2
+
+
+def test_failed_fred_refresh_is_visible_and_preserves_archive(tmp_path, monkeypatch) -> None:
+    monkeypatch.setattr(data_module, "CACHE_DIR", tmp_path)
+    archive = tmp_path / "fred" / "TEST.csv"
+    archive.parent.mkdir()
+    archive.write_text("date,value\n2000-01-01,1\n", encoding="utf-8")
+    monkeypatch.setattr(data_module, "_fresh", lambda *args: False)
+
+    class Offline:
+        def get(self, *args, **kwargs):
+            raise TimeoutError("offline")
+
+    monkeypatch.setattr(data_module, "_session", Offline)
+    data_module.reset_source_health()
+    result = data_module.fetch_fred_series("TEST")
+    assert result.iloc[-1] == 1
+    assert data_module.source_health()[0]["Status"] == "Fallback"
+    assert data_module.source_health()[0]["Detail"] == "TimeoutError"

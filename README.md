@@ -28,7 +28,24 @@ Charts default to **Since 1990**, so the dot-com peak, the 2007 credit-cycle tur
 
 The sidebar’s **Refresh all sources** button preserves `.world_kpi_cache/` history. FRED and market feeds download only a recent overlap, merge revisions and append new observations. Daily refresh does not make monthly or quarterly releases update daily; every KPI shows its own observation date and frequency.
 
-The repository includes `data_seed/world_kpi_seed.zip`, a compressed snapshot of the public source archives used by the dashboard. On a new deployment, missing cache files are hydrated from this seed before network refreshes begin. Seed data never overwrite a file that the server has already refreshed.
+The refresh summary reports actual downloads, cache hits and failed downloads. When a
+provider fails, saved history remains visible with a warning; the check time is never
+presented as the observation date. Detailed source status is in the KPI library.
+Seed files retain their original timestamps so extracting an old snapshot does not
+make it appear newly downloaded. Market requests try both Yahoo chart hosts.
+
+The **Refresh historical data** GitHub Actions workflow runs daily at 07:25 UTC and
+can also be started manually in the repository's Actions tab. It updates the compressed
+seed and publishes a per-source refresh report, retaining old history during partial
+outages. Repository Actions must be enabled, with workflow write permission allowed.
+Streamlit deployments tracking `main` receive these snapshot updates through deployment.
+To rebuild manually, run `python scripts/refresh_seed.py`.
+
+The AI capital loop includes dated Anthropic IPO and NVIDIA earnings announcements
+reviewed on 22 November 2026. These editorial notes link to primary company sources
+and are maintained separately from automatic market and macroeconomic feeds.
+
+The repository includes `data_seed/world_kpi_seed.zip`, a compressed snapshot of the public source archives used by the dashboard. Missing cache files are hydrated before network refreshes begin. New seed versions extend existing series while retaining runtime revisions, and replace raw SEC/Treasury snapshots only when the seed file is newer.
 
 For long-running server deployments, mount `.world_kpi_cache/` on persistent storage when the platform supports it. Streamlit Community Cloud can start directly from the bundled seed; newer observations and revisions are merged into its runtime cache while the instance remains available. A rebuild starts from the seed again and then resumes normal refreshes.
 

@@ -8,13 +8,15 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-from world_kpi.ai_loop import AI_RELATIONSHIPS, ai_loop_figure
+from world_kpi.ai_loop import AI_RELATIONSHIPS, AI_NEWS, ai_loop_figure
 from world_kpi.data import (
     CACHE_DIR,
     build_fred_snapshots,
     build_market_snapshots,
     build_sec_snapshots,
     hydrate_seed_cache,
+    reset_source_health,
+    source_health,
     load_daily_debt,
     load_fred_bundle,
     load_market_metrics,
@@ -58,6 +60,7 @@ inject_css()
 @st.cache_data(ttl=6 * 3600, show_spinner=False)
 def load_dashboard_data() -> dict:
     # Each provider can fail independently; one outage should not blank the full dashboard.
+    reset_source_health()
     hydrate_seed_cache()
     with ThreadPoolExecutor(max_workers=5) as executor:
         fred_job = executor.submit(load_fred_bundle)
@@ -137,6 +140,7 @@ def load_dashboard_data() -> dict:
         "company_capex": company_capex,
         "failures": {**fred_failures, **market_failures, **sec_failures},
         "loaded_at": datetime.now(timezone.utc),
+        "source_health": source_health(),
     }
 
 
@@ -216,6 +220,7 @@ with st.sidebar:
     st.markdown("<div class='eyebrow'>Control room</div>", unsafe_allow_html=True)
     st.markdown("### World KPI Radar")
     st.caption("Daily market signals + latest official macro releases")
+    st.caption("Build 2026-11-22 · refresh diagnostics + IPO update")
     history_window = st.selectbox(
         "History window",
         ("Since 1990 · recommended", "20 years", "10 years", "5 years"),
@@ -252,6 +257,20 @@ scores = category_scores(metrics)
 pressure = overall_pressure(scores)
 as_of = max(metric.as_of for metric in metrics)
 loaded_at = data["loaded_at"]
+health = pd.DataFrame(data["source_health"])
+if not health.empty:
+    fallback_count = int(health["Status"].isin(["Fallback", "Unavailable"]).sum())
+    downloads = int(health["Status"].eq("Downloaded").sum())
+    if fallback_count:
+        st.warning(
+            f"{fallback_count} source downloads failed; saved history is shown where available. "
+            f"{downloads} sources downloaded successfully. See Source health in the KPI library."
+        )
+    st.caption(
+        f"Last data check: {loaded_at:%d %b %Y %H:%M} UTC · "
+        f"{downloads} downloaded · {int(health['Status'].eq('Cached').sum())} cached · "
+        f"{fallback_count} failed. Each KPI shows its own observation date."
+    )
 
 st.markdown(
     f"""
@@ -259,7 +278,7 @@ st.markdown(
       <div class="eyebrow">Global macro • sovereign risk • AI capital cycle</div>
       <h1>World KPI<br>Radar</h1>
       <p>A historically calibrated early-warning dashboard for economic vulnerability and live market stress. It tracks {len(metrics)} signals across {len(scores)} pillars—then shows where today resembles, and differs from, the dot-com peak and the global financial crisis.</p>
-      <div class="tiny">Latest observation in the dashboard: {as_of:%d %B %Y} · refreshed {loaded_at:%d %b %Y %H:%M} UTC</div>
+      <div class="tiny">Latest observation in the dashboard: {as_of:%d %B %Y} · checked {loaded_at:%d %b %Y %H:%M} UTC</div>
     </div>
     """,
     unsafe_allow_html=True,
@@ -471,6 +490,12 @@ with markets_tab:
 
 with loop_tab:
     st.markdown("## The AI capital loop")
+    st.caption("News reviewed 22 November 2026 · dated announcements below are maintained separately from live KPI feeds.")
+    for news in AI_NEWS:
+        with st.expander(f"{news['date']} · {news['title']}", expanded=True):
+            st.markdown(news["facts"])
+            st.markdown(f"**Interpretation:** {news['interpretation']}")
+            st.markdown(f"[Company announcement]({news['source']})")
     st.markdown(
         "<p class='section-note'>Capital can flow from a vendor or cloud provider into a model company and return as chip or compute demand. That is not inherently fraudulent—but it can blur independent end demand and concentrate counterparty risk.</p>",
         unsafe_allow_html=True,
@@ -544,12 +569,14 @@ with library_tab:
         )
 
     st.markdown("### Source health")
+    if not health.empty:
+        st.dataframe(health.sort_values(["Status", "Source"]), hide_index=True, width="stretch")
     failures = data["failures"]
     if failures:
         st.warning(f"{len(failures)} source series did not refresh. Cached or remaining sources are still displayed.")
         with st.expander("Show unavailable series"):
             st.json(failures)
-    else:
+    elif health.empty or not health["Status"].isin(["Fallback", "Unavailable"]).any():
         st.success("All configured source calls returned usable data in this refresh.")
 
 st.markdown(

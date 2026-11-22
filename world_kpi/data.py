@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import io
+import hashlib
 import json
 import math
 import os
 import time
 import zipfile
+from datetime import datetime, timezone
+from threading import Lock
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any, Iterable
@@ -29,6 +32,34 @@ USER_AGENT = os.getenv(
 )
 CACHE_DIR = Path(os.getenv("WORLD_KPI_CACHE", ".world_kpi_cache"))
 SEED_ARCHIVE = Path(__file__).resolve().parent.parent / "data_seed" / "world_kpi_seed.zip"
+_HEALTH: dict[str, dict[str, str]] = {}
+_HEALTH_LOCK = Lock()
+
+
+def reset_source_health() -> None:
+    with _HEALTH_LOCK:
+        _HEALTH.clear()
+
+
+def source_health() -> list[dict[str, str]]:
+    with _HEALTH_LOCK:
+        return [dict(row) for row in _HEALTH.values()]
+
+
+def _record_health(path: Path, status: str, error: Exception | None = None) -> None:
+    # Avoid logging request URLs, which may contain an API key.
+    detail = ""
+    if error is not None:
+        response = getattr(error, "response", None)
+        code = getattr(response, "status_code", None)
+        detail = f"HTTP {code}" if code else type(error).__name__
+    with _HEALTH_LOCK:
+        _HEALTH[str(path)] = {
+            "Source": f"{path.parent.name}/{path.stem}",
+            "Status": status,
+            "Checked UTC": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "Detail": detail,
+        }
 
 
 def _session() -> requests.Session:
@@ -51,8 +82,8 @@ def hydrate_seed_cache(
     """Hydrate missing cache files from the versioned deployment seed.
 
     The seed makes a cold, stateless deployment useful even when a provider is
-    temporarily blocked. It never overwrites files that a running deployment has
-    already refreshed.
+    temporarily blocked. New seed versions can extend existing series and replace
+    older raw snapshots, while retaining runtime revisions in series archives.
     """
     archive = archive or SEED_ARCHIVE
     cache_dir = cache_dir or CACHE_DIR
@@ -60,6 +91,10 @@ def hydrate_seed_cache(
         return 0
 
     cache_root = cache_dir.resolve()
+    revision = hashlib.sha256(archive.read_bytes()).hexdigest()
+    marker = cache_dir / ".seed_revision"
+    previous_revision = marker.read_text() if marker.exists() else None
+    changed = previous_revision is not None and previous_revision != revision
     extracted = 0
     with zipfile.ZipFile(archive) as bundle:
         for member in bundle.infolist():
@@ -70,12 +105,36 @@ def hydrate_seed_cache(
                 target.relative_to(cache_root)
             except ValueError as exc:
                 raise ValueError(f"Unsafe path in deployment seed: {member.filename}") from exc
+            stamp = datetime(*member.date_time, tzinfo=timezone.utc).timestamp()
             if target.exists():
-                continue
+                if target.suffix == ".csv":
+                    # A new deployment snapshot may contain later observations
+                    # even when a previous runtime cache survived the deployment.
+                    existing = _read_cached_series(target, target.stem)
+                    seed = pd.read_csv(bundle.open(member))
+                    if not existing.empty and seed.shape[1] >= 2:
+                        incoming = clean_series(pd.Series(
+                            pd.to_numeric(seed.iloc[:, 1], errors="coerce").to_numpy(),
+                            index=pd.to_datetime(seed.iloc[:, 0], errors="coerce"),
+                        ))
+                        combined = existing.combine_first(incoming)
+                        if len(combined) > len(existing):
+                            old_stamp = target.stat().st_mtime
+                            _store_series(combined, target)
+                            os.utime(target, (min(old_stamp, stamp), min(old_stamp, stamp)))
+                # Replace older raw Treasury/SEC snapshots only when a new seed
+                # version arrives, not during an ordinary forced refresh.
+                if not (changed and target.suffix != ".csv" and stamp > target.stat().st_mtime):
+                    continue
             target.parent.mkdir(parents=True, exist_ok=True)
             with bundle.open(member) as source, target.open("wb") as destination:
                 destination.write(source.read())
+            # Extraction time is not a successful provider refresh. Preserve the
+            # archived timestamp so old seed data trigger an immediate update.
+            os.utime(target, (stamp, stamp))
             extracted += 1
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    marker.write_text(revision)
     return extracted
 
 
@@ -85,6 +144,7 @@ def _fresh(path: Path, max_age_hours: float) -> bool:
 
 def _get_bytes(url: str, *, cache: Path, max_age_hours: float, timeout: int = 20) -> bytes:
     if _fresh(cache, max_age_hours):
+        _record_health(cache, "Cached")
         return cache.read_bytes()
     try:
         response = _session().get(url, timeout=timeout)
@@ -93,8 +153,10 @@ def _get_bytes(url: str, *, cache: Path, max_age_hours: float, timeout: int = 20
         if len(content) < 10:
             raise ValueError(f"Empty response from {url}")
         cache.write_bytes(content)
+        _record_health(cache, "Downloaded")
         return content
-    except Exception:
+    except Exception as exc:
+        _record_health(cache, "Fallback" if cache.exists() else "Unavailable", exc)
         if cache.exists():
             return cache.read_bytes()
         raise
@@ -138,6 +200,7 @@ def fetch_fred_series(series_id: str, start: str = "1990-01-01") -> pd.Series:
     archive = _cache_path("fred", series_id, "csv")
     cached = _read_cached_series(archive, series_id)
     if not cached.empty and _fresh(archive, 18):
+        _record_health(archive, "Cached")
         return cached
 
     requested_start = pd.Timestamp(start)
@@ -158,10 +221,14 @@ def fetch_fred_series(series_id: str, start: str = "1990-01-01") -> pd.Series:
                 name=series_id,
             )
         )
+        if update.empty:
+            raise ValueError(f"Empty FRED response for {series_id}")
         combined = merge_incremental_series(cached, update)
         _store_series(combined, archive)
+        _record_health(archive, "Downloaded")
         return combined
-    except Exception:
+    except Exception as exc:
+        _record_health(archive, "Fallback" if not cached.empty else "Unavailable", exc)
         if not cached.empty:
             return cached
         raise
@@ -378,9 +445,22 @@ def _fetch_yahoo_chart(symbol: str, start: pd.Timestamp) -> tuple[pd.Series, boo
         YAHOO_CHART.format(symbol=quote(symbol, safe=""))
         + f"?period1={period1}&period2={period2}&interval=1d&events=history"
     )
-    response = _session().get(url, timeout=20)
-    response.raise_for_status()
-    result = response.json()["chart"]["result"][0]
+    last_error: Exception | None = None
+    for host in ("query1.finance.yahoo.com", "query2.finance.yahoo.com"):
+        try:
+            response = _session().get(
+                url.replace("query1.finance.yahoo.com", host), timeout=15,
+                headers={"User-Agent": "Mozilla/5.0 WorldKPIRadar"},
+            )
+            response.raise_for_status()
+            result = response.json()["chart"]["result"][0]
+            if not result.get("timestamp"):
+                raise ValueError("Empty market history")
+            break
+        except Exception as exc:
+            last_error = exc
+    else:
+        raise last_error or ValueError("Market provider unavailable")
     timestamps = pd.to_datetime(result["timestamp"], unit="s", utc=True).tz_localize(None)
     quote_data = result["indicators"]["quote"][0]
     prices = quote_data.get("close", [])
@@ -392,20 +472,25 @@ def _yahoo_prices(symbol: str, start: str = "1990-01-01") -> pd.Series:
     archive = _cache_path("markets", symbol, "csv")
     cached = _read_cached_series(archive, symbol)
     if not cached.empty and _fresh(archive, 8):
+        _record_health(archive, "Cached")
         return cached
 
     full_start = pd.Timestamp(start)
     update_start = full_start if cached.empty else max(full_start, cached.index[-1] - pd.Timedelta(days=45))
     try:
         update, split_occurred = _fetch_yahoo_chart(symbol, update_start)
+        if update.empty:
+            raise ValueError("Empty market history")
         # A split changes the scale of old closing prices, so rebuild that rare archive once.
         if split_occurred and not cached.empty:
             update, _ = _fetch_yahoo_chart(symbol, full_start)
             cached = pd.Series(dtype=float, name=symbol)
         combined = merge_incremental_series(cached, update)
         _store_series(combined, archive)
+        _record_health(archive, "Downloaded")
         return combined
-    except Exception:
+    except Exception as exc:
+        _record_health(archive, "Fallback" if not cached.empty else "Unavailable", exc)
         if not cached.empty:
             return cached
         raise

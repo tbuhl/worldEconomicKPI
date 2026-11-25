@@ -1,376 +1,376 @@
 {
-  "checked_utc": "2026-11-24T18:58:29.568175+00:00",
+  "checked_utc": "2026-11-25T18:02:46.461269+00:00",
   "sources": [
     {
       "Source": "fred/SAHMREALTIME",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:15+00:00",
-      "Detail": ""
-    },
-    {
-      "Source": "fred/A191RL1Q225SBEA",
-      "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:15+00:00",
+      "Checked UTC": "2026-11-25T18:02:29+00:00",
       "Detail": ""
     },
     {
       "Source": "fred/RSAFS",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:15+00:00",
-      "Detail": ""
-    },
-    {
-      "Source": "fred/PAYEMS",
-      "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:15+00:00",
-      "Detail": ""
-    },
-    {
-      "Source": "fred/ICSA",
-      "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:15+00:00",
+      "Checked UTC": "2026-11-25T18:02:29+00:00",
       "Detail": ""
     },
     {
       "Source": "fred/JTSJOL",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:15+00:00",
+      "Checked UTC": "2026-11-25T18:02:29+00:00",
       "Detail": ""
     },
     {
       "Source": "fred/INDPRO",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:15+00:00",
-      "Detail": ""
-    },
-    {
-      "Source": "fred/UMCSENT",
-      "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:15+00:00",
-      "Detail": ""
-    },
-    {
-      "Source": "fred/CPIAUCSL",
-      "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:15+00:00",
+      "Checked UTC": "2026-11-25T18:02:29+00:00",
       "Detail": ""
     },
     {
       "Source": "fred/UNRATE",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:15+00:00",
+      "Checked UTC": "2026-11-25T18:02:29+00:00",
       "Detail": ""
     },
     {
-      "Source": "fred/PERMIT",
+      "Source": "fred/PAYEMS",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:15+00:00",
+      "Checked UTC": "2026-11-25T18:02:29+00:00",
       "Detail": ""
     },
     {
-      "Source": "fred/PCEPILFE",
+      "Source": "fred/ICSA",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:15+00:00",
+      "Checked UTC": "2026-11-25T18:02:29+00:00",
       "Detail": ""
     },
     {
-      "Source": "fred/CPILFESL",
+      "Source": "fred/A191RL1Q225SBEA",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:15+00:00",
+      "Checked UTC": "2026-11-25T18:02:29+00:00",
+      "Detail": ""
+    },
+    {
+      "Source": "fred/UMCSENT",
+      "Status": "Downloaded",
+      "Checked UTC": "2026-11-25T18:02:29+00:00",
       "Detail": ""
     },
     {
       "Source": "fred/RECPROUSM156N",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:15+00:00",
+      "Checked UTC": "2026-11-25T18:02:29+00:00",
       "Detail": ""
     },
     {
-      "Source": "fred/MORTGAGE30US",
+      "Source": "fred/CPIAUCSL",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:16+00:00",
+      "Checked UTC": "2026-11-25T18:02:29+00:00",
+      "Detail": ""
+    },
+    {
+      "Source": "fred/PERMIT",
+      "Status": "Downloaded",
+      "Checked UTC": "2026-11-25T18:02:29+00:00",
+      "Detail": ""
+    },
+    {
+      "Source": "fred/CPILFESL",
+      "Status": "Downloaded",
+      "Checked UTC": "2026-11-25T18:02:29+00:00",
+      "Detail": ""
+    },
+    {
+      "Source": "fred/PCEPILFE",
+      "Status": "Downloaded",
+      "Checked UTC": "2026-11-25T18:02:29+00:00",
       "Detail": ""
     },
     {
       "Source": "fred/DFF",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:16+00:00",
-      "Detail": ""
-    },
-    {
-      "Source": "fred/T5YIFR",
-      "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:16+00:00",
+      "Checked UTC": "2026-11-25T18:02:29+00:00",
       "Detail": ""
     },
     {
       "Source": "fred/DFII10",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:16+00:00",
+      "Checked UTC": "2026-11-25T18:02:29+00:00",
       "Detail": ""
     },
     {
-      "Source": "fred/DGS2",
+      "Source": "fred/MORTGAGE30US",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:16+00:00",
-      "Detail": ""
-    },
-    {
-      "Source": "fred/DGS30",
-      "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:16+00:00",
+      "Checked UTC": "2026-11-25T18:02:30+00:00",
       "Detail": ""
     },
     {
       "Source": "fred/DGS10",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:16+00:00",
+      "Checked UTC": "2026-11-25T18:02:30+00:00",
+      "Detail": ""
+    },
+    {
+      "Source": "fred/T5YIFR",
+      "Status": "Downloaded",
+      "Checked UTC": "2026-11-25T18:02:30+00:00",
       "Detail": ""
     },
     {
       "Source": "fred/DGS3MO",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:16+00:00",
+      "Checked UTC": "2026-11-25T18:02:30+00:00",
       "Detail": ""
     },
     {
-      "Source": "fred/A091RC1Q027SBEA",
+      "Source": "fred/DGS2",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:16+00:00",
+      "Checked UTC": "2026-11-25T18:02:30+00:00",
       "Detail": ""
     },
     {
       "Source": "fred/GFDEGDQ188S",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:16+00:00",
-      "Detail": ""
-    },
-    {
-      "Source": "fred/T10Y3M",
-      "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:16+00:00",
-      "Detail": ""
-    },
-    {
-      "Source": "fred/T10Y2Y",
-      "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:16+00:00",
-      "Detail": ""
-    },
-    {
-      "Source": "fred/THREEFFTP10",
-      "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:16+00:00",
+      "Checked UTC": "2026-11-25T18:02:30+00:00",
       "Detail": ""
     },
     {
       "Source": "fred/IRLTLT01JPM156N",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:16+00:00",
+      "Checked UTC": "2026-11-25T18:02:30+00:00",
+      "Detail": ""
+    },
+    {
+      "Source": "fred/DGS30",
+      "Status": "Downloaded",
+      "Checked UTC": "2026-11-25T18:02:30+00:00",
       "Detail": ""
     },
     {
       "Source": "fred/DEXJPUS",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:17+00:00",
-      "Detail": ""
-    },
-    {
-      "Source": "fred/BAMLH0A0HYM2",
-      "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:17+00:00",
-      "Detail": ""
-    },
-    {
-      "Source": "fred/NFCI",
-      "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:17+00:00",
-      "Detail": ""
-    },
-    {
-      "Source": "fred/STLFSI4",
-      "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:17+00:00",
-      "Detail": ""
-    },
-    {
-      "Source": "fred/DRTSCILM",
-      "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:17+00:00",
-      "Detail": ""
-    },
-    {
-      "Source": "fred/DRCCLACBS",
-      "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:17+00:00",
-      "Detail": ""
-    },
-    {
-      "Source": "fred/DRSFRMACBS",
-      "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:17+00:00",
+      "Checked UTC": "2026-11-25T18:02:30+00:00",
       "Detail": ""
     },
     {
       "Source": "fred/BAMLC0A0CM",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:17+00:00",
+      "Checked UTC": "2026-11-25T18:02:30+00:00",
       "Detail": ""
     },
     {
-      "Source": "fred/DCOILWTICO",
+      "Source": "fred/NFCI",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:17+00:00",
+      "Checked UTC": "2026-11-25T18:02:31+00:00",
       "Detail": ""
     },
     {
-      "Source": "fred/TOTLL",
+      "Source": "fred/THREEFFTP10",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:17+00:00",
+      "Checked UTC": "2026-11-25T18:02:31+00:00",
       "Detail": ""
     },
     {
-      "Source": "fred/PCOPPUSDM",
+      "Source": "fred/DRTSCILM",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:17+00:00",
+      "Checked UTC": "2026-11-25T18:02:31+00:00",
       "Detail": ""
     },
     {
-      "Source": "fred/VIXCLS",
+      "Source": "fred/DRCCLACBS",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:17+00:00",
+      "Checked UTC": "2026-11-25T18:02:31+00:00",
+      "Detail": ""
+    },
+    {
+      "Source": "fred/DRSFRMACBS",
+      "Status": "Downloaded",
+      "Checked UTC": "2026-11-25T18:02:31+00:00",
+      "Detail": ""
+    },
+    {
+      "Source": "fred/STLFSI4",
+      "Status": "Downloaded",
+      "Checked UTC": "2026-11-25T18:02:31+00:00",
       "Detail": ""
     },
     {
       "Source": "fred/DTWEXBGS",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:17+00:00",
+      "Checked UTC": "2026-11-25T18:02:31+00:00",
+      "Detail": ""
+    },
+    {
+      "Source": "fred/DCOILWTICO",
+      "Status": "Downloaded",
+      "Checked UTC": "2026-11-25T18:02:31+00:00",
+      "Detail": ""
+    },
+    {
+      "Source": "fred/BAMLH0A0HYM2",
+      "Status": "Downloaded",
+      "Checked UTC": "2026-11-25T18:02:31+00:00",
+      "Detail": ""
+    },
+    {
+      "Source": "fred/T10Y2Y",
+      "Status": "Downloaded",
+      "Checked UTC": "2026-11-25T18:02:31+00:00",
+      "Detail": ""
+    },
+    {
+      "Source": "fred/TOTLL",
+      "Status": "Downloaded",
+      "Checked UTC": "2026-11-25T18:02:31+00:00",
+      "Detail": ""
+    },
+    {
+      "Source": "fred/T10Y3M",
+      "Status": "Downloaded",
+      "Checked UTC": "2026-11-25T18:02:31+00:00",
+      "Detail": ""
+    },
+    {
+      "Source": "fred/VIXCLS",
+      "Status": "Downloaded",
+      "Checked UTC": "2026-11-25T18:02:31+00:00",
+      "Detail": ""
+    },
+    {
+      "Source": "fred/PCOPPUSDM",
+      "Status": "Downloaded",
+      "Checked UTC": "2026-11-25T18:02:32+00:00",
+      "Detail": ""
+    },
+    {
+      "Source": "fred/A091RC1Q027SBEA",
+      "Status": "Downloaded",
+      "Checked UTC": "2026-11-25T18:02:32+00:00",
       "Detail": ""
     },
     {
       "Source": "fred/USEPUINDXD",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:17+00:00",
+      "Checked UTC": "2026-11-25T18:02:32+00:00",
       "Detail": ""
     },
     {
       "Source": "fred/ECBDFR",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:17+00:00",
-      "Detail": ""
-    },
-    {
-      "Source": "markets/QQQ",
-      "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:18+00:00",
+      "Checked UTC": "2026-11-25T18:02:32+00:00",
       "Detail": ""
     },
     {
       "Source": "markets/NVDA",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:18+00:00",
-      "Detail": ""
-    },
-    {
-      "Source": "markets/RSP",
-      "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:18+00:00",
-      "Detail": ""
-    },
-    {
-      "Source": "markets/MSFT",
-      "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:18+00:00",
+      "Checked UTC": "2026-11-25T18:02:32+00:00",
       "Detail": ""
     },
     {
       "Source": "markets/SOXX",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:18+00:00",
+      "Checked UTC": "2026-11-25T18:02:32+00:00",
+      "Detail": ""
+    },
+    {
+      "Source": "markets/QQQ",
+      "Status": "Downloaded",
+      "Checked UTC": "2026-11-25T18:02:32+00:00",
+      "Detail": ""
+    },
+    {
+      "Source": "markets/RSP",
+      "Status": "Downloaded",
+      "Checked UTC": "2026-11-25T18:02:32+00:00",
+      "Detail": ""
+    },
+    {
+      "Source": "markets/MSFT",
+      "Status": "Downloaded",
+      "Checked UTC": "2026-11-25T18:02:32+00:00",
       "Detail": ""
     },
     {
       "Source": "markets/SPY",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:18+00:00",
+      "Checked UTC": "2026-11-25T18:02:32+00:00",
       "Detail": ""
     },
     {
       "Source": "markets/GOOGL",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:18+00:00",
-      "Detail": ""
-    },
-    {
-      "Source": "markets/AMZN",
-      "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:18+00:00",
-      "Detail": ""
-    },
-    {
-      "Source": "markets/META",
-      "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:18+00:00",
+      "Checked UTC": "2026-11-25T18:02:32+00:00",
       "Detail": ""
     },
     {
       "Source": "markets/PLTR",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:18+00:00",
+      "Checked UTC": "2026-11-25T18:02:32+00:00",
+      "Detail": ""
+    },
+    {
+      "Source": "markets/META",
+      "Status": "Downloaded",
+      "Checked UTC": "2026-11-25T18:02:33+00:00",
       "Detail": ""
     },
     {
       "Source": "markets/ORCL",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:18+00:00",
+      "Checked UTC": "2026-11-25T18:02:33+00:00",
+      "Detail": ""
+    },
+    {
+      "Source": "markets/AMZN",
+      "Status": "Downloaded",
+      "Checked UTC": "2026-11-25T18:02:33+00:00",
       "Detail": ""
     },
     {
       "Source": "sec/0001652044",
       "Status": "Fallback",
-      "Checked UTC": "2026-11-24T18:58:18+00:00",
-      "Detail": "HTTP 403"
-    },
-    {
-      "Source": "sec/0001018724",
-      "Status": "Fallback",
-      "Checked UTC": "2026-11-24T18:58:18+00:00",
+      "Checked UTC": "2026-11-25T18:02:33+00:00",
       "Detail": "HTTP 403"
     },
     {
       "Source": "sec/0001326801",
       "Status": "Fallback",
-      "Checked UTC": "2026-11-24T18:58:18+00:00",
+      "Checked UTC": "2026-11-25T18:02:33+00:00",
+      "Detail": "HTTP 403"
+    },
+    {
+      "Source": "sec/0001018724",
+      "Status": "Fallback",
+      "Checked UTC": "2026-11-25T18:02:33+00:00",
       "Detail": "HTTP 403"
     },
     {
       "Source": "sec/0000789019",
       "Status": "Fallback",
-      "Checked UTC": "2026-11-24T18:58:18+00:00",
+      "Checked UTC": "2026-11-25T18:02:33+00:00",
       "Detail": "HTTP 403"
     },
     {
       "Source": "sec/0001341439",
       "Status": "Fallback",
-      "Checked UTC": "2026-11-24T18:58:18+00:00",
+      "Checked UTC": "2026-11-25T18:02:33+00:00",
       "Detail": "HTTP 403"
     },
     {
       "Source": "sec/0001045810",
       "Status": "Fallback",
-      "Checked UTC": "2026-11-24T18:58:19+00:00",
+      "Checked UTC": "2026-11-25T18:02:33+00:00",
       "Detail": "HTTP 403"
     },
     {
       "Source": "treasury/debt_to_penny",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:19+00:00",
+      "Checked UTC": "2026-11-25T18:02:35+00:00",
       "Detail": ""
     },
     {
       "Source": "treasury/tic_table3",
       "Status": "Downloaded",
-      "Checked UTC": "2026-11-24T18:58:29+00:00",
+      "Checked UTC": "2026-11-25T18:02:45+00:00",
       "Detail": ""
     }
   ]
